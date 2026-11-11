@@ -1,94 +1,130 @@
-# Atividade LGPD
+# mini_projeto_lgpd
 
-O projeto exporta registros de uma tabela PostgreSQL sem modificar o banco de origem. A atividade 2 separa os dados por ano de nascimento e aplica as máscaras pedidas. A atividade 3 gera um CSV com todos os nomes e CPFs originais.
+Projeto em Python para consultar cadastros de usuários e exportar arquivos CSV, com opções de mascaramento de dados e organização por ano de nascimento.
 
-## Executar pelo menu
+A aplicação funciona pelo terminal e oferece um menu para escolher a origem dos dados, o tipo de exportação e a pasta dos arquivos. É possível experimentar o fluxo com dados fictícios incluídos ou configurar a conexão com um banco PostgreSQL.
 
-1. Extraia o ZIP.
-2. No VS Code, abra a pasta que contém `main.py` e `requirements.txt`.
-3. Abra `main.py` e clique em **Executar Arquivo Python no Terminal**. Também é possível usar F5 com a configuração **Executar pelo menu**.
-4. Responda às opções que aparecem no terminal integrado.
+## Funcionalidades
 
-Não é necessário abrir o CMD, usar outro terminal nem digitar argumentos. A execução comum sempre abre o menu. O `main.py` cria a `.venv` e instala as dependências automaticamente; a primeira instalação precisa de internet. Depois ele reutiliza o ambiente e os pacotes.
+- Exportação de registros mascarados, separados por ano de nascimento.
+- Exportação de nomes e CPFs originais em um único arquivo.
+- Execução das duas exportações na mesma operação.
+- Filtro por ano para os registros mascarados.
+- Registro da duração e do resultado das exportações.
+- Preparação automática do ambiente virtual e das dependências.
 
-O projeto requer Python 3.10 ou superior; Python 3.15 é a versão adotada no trabalho. Se o VS Code solicitar um interpretador, selecione o Python instalado. O painel **Saída** não recebe respostas de teclado: use o terminal integrado para responder ao menu.
+## Como executar
 
-### Apresentar com os dados incluídos
+O projeto aceita Python 3.10 ou superior. A versão adotada no projeto é Python 3.15.
 
-No menu, siga estas escolhas:
+1. Baixe ou clone o repositório.
+2. Abra no VS Code a pasta que contém `main.py` e `requirements.txt`.
+3. Abra `main.py` e selecione **Executar Arquivo Python no Terminal**.
+4. Responda às opções exibidas no terminal integrado.
 
-1. Na origem, escolha **1 — Demonstração com dados incluídos**.
-2. Na atividade, escolha **3 — Executar as duas atividades**.
-3. No ano, pressione **Enter** para exportar todos os anos.
-4. Na pasta de saída, pressione **Enter** para usar `saida`.
+O `main.py` cria a `.venv`, verifica o pip e instala as dependências. A primeira instalação precisa de internet. Nas próximas execuções, o ambiente é reutilizado.
 
-Essas são as escolhas padrão: pressionar Enter nas quatro perguntas executa a demonstração completa. Ela usa SQLite em memória com dados fictícios, sem solicitar host, banco ou senha. Escolher **0 — Sair** na primeira pergunta encerra sem exportar.
+Não é necessário ativar a venv manualmente nem informar argumentos para usar o programa. Quem preferir iniciar pelo terminal pode executar:
 
-O resultado aparece no terminal com o caminho completo dos arquivos. Abra a pasta `saida`, depois a pasta `lgpd-...` criada nessa execução. Ela contém:
+```bash
+python main.py
+```
 
-- `exportacoes/mascarados/1990.csv`: um registro mascarado;
-- `exportacoes/mascarados/1991.csv`: dois registros mascarados;
-- `exportacoes/identificados/todos.csv`: os três nomes e CPFs fictícios originais;
-- `execucao.log`: operações executadas e duração.
+Use o terminal integrado do VS Code para responder às perguntas. O painel **Saída** não recebe entradas de teclado.
 
-Cada execução cria outra pasta, sem sobrescrever a anterior. Não há página no navegador: o programa apresenta as escolhas no terminal, exporta os arquivos e encerra.
+## Modos de execução
 
-### Escolher outra operação
+| Modo | Funcionamento |
+| --- | --- |
+| Demonstração com dados incluídos | Cria um SQLite em memória com três registros fictícios. Não solicita host, banco ou senha. |
+| Configurar conexão PostgreSQL | Solicita os dados de acesso e consulta uma tabela existente, sem alterar os registros de origem. |
 
-O próprio menu permite selecionar apenas uma atividade, filtrar o ano e alterar a pasta dos arquivos. O ano não é solicitado quando a escolha é somente a atividade 3, pois ela sempre exporta todos os nomes e CPFs. Opções e anos inválidos são perguntados novamente. Ctrl+C cancela a execução.
+### Demonstração
 
-## PostgreSQL opcional
+Para conferir o fluxo completo, escolha a demonstração, selecione as duas exportações, deixe o ano em branco e mantenha a pasta de saída padrão.
 
-Na origem do menu, escolha **2 — Configurar conexão PostgreSQL** somente se já tiver o servidor e o banco da atividade. Em seguida, escolha atividade, ano, pasta de saída e modo TLS. Depois o programa solicita os dados de conexão. Esse modo não cria banco nem popula tabelas.
+Pressionar Enter nas quatro perguntas utiliza essas escolhas. O programa gera os arquivos, informa o caminho no terminal e encerra. Os dados fictícios são recriados em memória a cada execução.
 
-A tabela `usuarios` já deve existir. O programa espera as colunas:
+### PostgreSQL
+
+Selecione **Configurar conexão PostgreSQL** no menu. Informe as opções de exportação, o modo TLS e os dados de conexão: host, porta, banco, usuário e senha.
+
+A opção configura o acesso a um servidor existente. Ela não instala o PostgreSQL, não cria o banco e não popula tabelas.
+
+A tabela `usuarios` precisa conter as colunas:
 
 ```text
 id, nome, cpf, email, telefone, data_nascimento, created_on, updated_on
 ```
 
-Os nomes `created_on` e `updated_on` foram mantidos no mapeamento para continuar compatível com o banco original. No CSV, os cabeçalhos correspondentes são `criado_em` e `atualizado_em`.
+O modo TLS padrão, `verify-full`, verifica certificado e host. A alternativa `require` exige criptografia, mas não oferece a mesma verificação de identidade do servidor.
 
-Na opção Configurar conexão PostgreSQL do menu, o programa solicita host, porta, banco, usuário e senha. Para um servidor local, o host costuma ser `localhost` e a porta `5432`; o nome do banco, o usuário e a senha são os que foram configurados no PostgreSQL. A senha é lida com `getpass` e não é gravada no código nem no log. A transação é somente de leitura, usa um retrato consistente dos dados e tem tempo limite para as consultas.
+A senha é solicitada sem exibição no terminal. A conexão utiliza uma transação somente de leitura e tempo limite para as consultas.
 
-No menu TLS, a opção 1 (`verify-full`) verifica certificado e host e exige uma configuração válida de certificados. A opção 2 (`require`) exige criptografia, mas não oferece a mesma verificação de identidade do servidor. Configure o acesso conforme o banco utilizado.
+## Exportações e mascaramento
 
-O filtro por ano vale somente para a atividade 2. A atividade 3 sempre exporta todos os nomes e CPFs, mesmo quando um ano foi informado.
+A exportação mascarada gera um CSV para cada ano de nascimento encontrado. Quando um ano é informado, somente os registros daquele ano são exportados.
 
-## Máscaras e arquivos
+| Campo | Tratamento |
+| --- | --- |
+| Nome | Preserva a inicial do primeiro nome e os sobrenomes. |
+| CPF | Preserva os três primeiros dígitos e substitui os demais por asteriscos. |
+| E-mail | Preserva a inicial e o domínio, ocultando o restante antes do arroba. |
+| Telefone | Retorna somente os quatro últimos dígitos. |
 
-As máscaras preservam a inicial do primeiro nome, os três primeiros dígitos do CPF, a inicial e o domínio do e-mail e os quatro últimos dígitos do telefone. A validação do CPF confere o formato, sem calcular seus dígitos verificadores.
+O identificador e as datas permanecem nos registros mascarados. A validação do CPF verifica o formato, sem calcular os dígitos verificadores.
 
-Cada execução cria uma pasta exclusiva dentro de `saida`. Os resultados ficam em:
+A exportação identificada contém todos os nomes e CPFs originais. O filtro por ano não se aplica a ela, mesmo quando as duas exportações são executadas juntas.
 
-- `exportacoes/mascarados/1990.csv`: um arquivo para cada ano selecionado ou encontrado;
-- `exportacoes/identificados/todos.csv`: nomes e CPFs originais da atividade 3;
-- `execucao.log`: nome da operação, situação e duração em segundos.
+## Fluxo do código
 
-O CSV usa UTF-8 com BOM e campos entre aspas. Valores com prefixos de fórmula ou caracteres de controle são recusados. O código não altera silenciosamente essas células para concluir a exportação.
+1. O `main.py` prepara o ambiente e inicia a aplicação com o Python da venv.
+2. O menu recebe a origem dos dados, a exportação desejada, o ano e a pasta de saída. Respostas inválidas são solicitadas novamente.
+3. A aplicação abre o SQLite de demonstração ou a conexão PostgreSQL.
+4. O repositório consulta os registros necessários.
+5. As rotinas de proteção validam os valores e aplicam as máscaras na exportação mascarada.
+6. Os CSVs são escritos em uma pasta temporária. A pasta final de exportações só é publicada quando todas as operações terminam.
+7. O programa informa o resultado, encerra as conexões e libera os recursos utilizados.
 
-Os arquivos são preparados em um diretório temporário. A pasta `exportacoes` só é publicada depois que o lote inteiro termina. Se houver uma falha comum durante a escrita ou leitura, os arquivos parciais são descartados. O log da execução permanece disponível para indicar a etapa que terminou com falha.
+Um decorador mede o tempo das exportações e registra sucesso ou falha no log. Se uma exportação falhar, o lote parcial é descartado e a aplicação apresenta uma mensagem no terminal.
 
-## Organização
+## Organização do projeto
 
-Os módulos estão agrupados por responsabilidade, com dois a quatro arquivos de implementação em cada subpasta:
+| Caminho | Responsabilidade |
+| --- | --- |
+| `main.py` | Preparar o ambiente e iniciar a aplicação. |
+| `inicializacao/` | Criar a venv, recuperar o pip e instalar dependências. |
+| `lgpd/execucao/` | Menu, leitura das respostas e coordenação do fluxo. |
+| `lgpd/dados/` | Conexões, esquema da tabela, consultas e dados de demonstração. |
+| `lgpd/protecao/` | Validação e mascaramento dos valores. |
+| `lgpd/exportacao/` | Operações de exportação, escrita e publicação dos CSVs. |
+| `lgpd/monitoramento/` | Registro de eventos e medição de tempo. |
+| `testes/` | Verificações de exportação, menu, validações e preparação do ambiente. |
 
-- `main.py`: ponto de entrada e chamada da aplicação;
-- `inicializacao/`: criação da venv, recuperação do pip e instalação dos pacotes;
-- `lgpd/execucao/`: coordenação da exportação e leitura das opções do terminal;
-- `lgpd/dados/`: conexão, mapeamento da tabela, consultas e banco de demonstração;
-- `lgpd/exportacao/`: atividades, escrita dos CSVs e publicação do lote;
-- `lgpd/protecao/`: mascaramento e validação dos valores;
-- `lgpd/monitoramento/`: log da execução e medição de tempo;
-- `testes/`: casos de transformação, exportação, falhas e preparação do ambiente.
+As funções e as docstrings estão em português. Os módulos separam a interação com o usuário, o acesso aos dados, as regras de mascaramento e a gravação dos arquivos.
 
-O `main.py` prepara o ambiente e chama `lgpd.execucao.aplicacao`. Esse módulo abre o menu, recebe as escolhas, abre a origem de dados, prepara o log e coordena as exportações. `menu.py` organiza as perguntas, `entrada.py` valida as respostas e `argumentos.py` mantém a alternativa por argumentos para quem preferir. As atividades consultam `dados`, aplicam as regras de `protecao` e gravam os arquivos por meio de `exportacao`. O decorador de tempo registra a duração em `monitoramento`.
+## Arquivos gerados
 
-As funções e as docstrings estão em português. Os títulos `Args`, `Returns`, `Yields` e `Raises` seguem a convenção das docstrings Google. Os corpos têm no máximo dez linhas físicas, desconsiderando documentação, comentários e linhas vazias. Nomes de bibliotecas, métodos externos e colunas existentes no banco foram preservados.
+Por padrão, cada execução cria uma pasta exclusiva dentro de `saida`. Na demonstração completa, são gerados:
 
-## Conferir o funcionamento
+- `exportacoes/mascarados/1990.csv`: registros mascarados de 1990.
+- `exportacoes/mascarados/1991.csv`: registros mascarados de 1991.
+- `exportacoes/identificados/todos.csv`: nomes e CPFs fictícios originais.
+- `execucao.log`: operações, resultado e duração.
 
-Depois da preparação do ambiente, no Windows:
+Os arquivos usam UTF-8 com BOM e campos entre aspas. Valores com prefixos de fórmulas ou caracteres de controle são recusados. Execuções anteriores não são sobrescritas.
+
+## Cuidados com os dados
+
+O projeto demonstra técnicas de mascaramento e cuidados na exportação. Isso não garante anonimização nem conformidade completa com a LGPD: sobrenomes, datas e outros campos preservados ainda podem permitir identificação.
+
+A exportação identificada mantém nomes e CPFs originais. Não publique arquivos com dados de pessoas reais no repositório. O `.gitignore` exclui a venv, os CSVs, os logs e a pasta de saída padrão.
+
+## Testes
+
+Depois da preparação do ambiente, execute os testes pelo Python da venv.
+
+No Windows:
 
 ```powershell
 .\.venv\Scripts\python.exe -m testes.executar
@@ -100,13 +136,4 @@ No Linux ou macOS:
 .venv/bin/python -m testes.executar
 ```
 
-Os cenários de exportação usam SQLite em memória. A configuração da transação PostgreSQL é conferida com uma conexão simulada; isso não substitui executar contra o banco e o certificado da instituição. O teste do iniciador cria uma venv temporária e instala um pacote local, sem depender de downloads para esse ensaio.
-
-## Alternativa para automação
-
-Quem preferir ainda pode fornecer argumentos; nesse caso o menu não é aberto. Eles não são necessários para usar o projeto pelo VS Code. Exemplos:
-
-```bash
-python main.py --demonstracao --atividade todas
-python main.py --postgres --atividade 2 --ano 1990
-```
+Os testes usam SQLite em memória e verificam o menu, as exportações, as máscaras, o tratamento de falhas e o iniciador. A conexão PostgreSQL é simulada nos testes; o acesso ao servidor e os certificados precisam ser conferidos no ambiente em que serão utilizados.
