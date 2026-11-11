@@ -1,0 +1,14 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+saida/
+output/
+*.csv
+*.log
+*.db
+*.sqlite
+*.sqlite3
+.env
+.env.*
