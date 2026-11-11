@@ -102,12 +102,6 @@ No Linux ou macOS:
 
 Os cenários de exportação usam SQLite em memória. A configuração da transação PostgreSQL é conferida com uma conexão simulada; isso não substitui executar contra o banco e o certificado da instituição. O teste do iniciador cria uma venv temporária e instala um pacote local, sem depender de downloads para esse ensaio.
 
-## Publicar no GitHub
-
-Publique o código, a documentação e os testes. O `.gitignore` exclui a venv, os arquivos CSV, os logs, a saída padrão e os bancos locais. Se escolher outra pasta de saída, mantenha-a fora do versionamento.
-
-Mascaramento não garante anonimização: sobrenomes, datas, identificadores e outros campos ainda podem permitir identificação. A atividade 3 preserva nomes e CPFs por exigência do exercício. Use a demonstração para apresentar o projeto e não publique exportações de pessoas reais. As permissões POSIX usadas na criação dos arquivos não substituem as permissões de acesso do Windows.
-
 ## Alternativa para automação
 
 Quem preferir ainda pode fornecer argumentos; nesse caso o menu não é aberto. Eles não são necessários para usar o projeto pelo VS Code. Exemplos:
